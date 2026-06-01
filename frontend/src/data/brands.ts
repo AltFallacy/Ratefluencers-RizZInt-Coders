@@ -1,0 +1,100 @@
+import type { BrandMatch } from '@/types';
+
+export const brandMatches: BrandMatch[] = [
+  {
+    id: 'brand-001',
+    name: 'Nike',
+    industry: ['Sportswear', 'Fitness'],
+    matchScore: 94,
+    compatibility: {
+      audienceOverlap: 96,
+      contentStyle: 91,
+      engagementQuality: 95,
+      brandSafety: 93,
+    },
+    color: '#f97316',
+    initials: 'NK',
+  },
+  {
+    id: 'brand-002',
+    name: 'Adidas',
+    industry: ['Sportswear', 'Lifestyle'],
+    matchScore: 91,
+    compatibility: {
+      audienceOverlap: 93,
+      contentStyle: 88,
+      engagementQuality: 92,
+      brandSafety: 91,
+    },
+    color: '#3b82f6',
+    initials: 'AD',
+  },
+  {
+    id: 'brand-003',
+    name: 'Apple',
+    industry: ['Tech', 'Consumer Electronics'],
+    matchScore: 88,
+    compatibility: {
+      audienceOverlap: 85,
+      contentStyle: 92,
+      engagementQuality: 90,
+      brandSafety: 96,
+    },
+    color: '#6b7280',
+    initials: 'AP',
+  },
+  {
+    id: 'brand-004',
+    name: 'GoPro',
+    industry: ['Tech', 'Lifestyle', 'Adventure'],
+    matchScore: 85,
+    compatibility: {
+      audienceOverlap: 88,
+      contentStyle: 86,
+      engagementQuality: 83,
+      brandSafety: 89,
+    },
+    color: '#10b981',
+    initials: 'GP',
+  },
+  {
+    id: 'brand-005',
+    name: 'Samsung',
+    industry: ['Consumer Electronics', 'Tech'],
+    matchScore: 74,
+    compatibility: {
+      audienceOverlap: 72,
+      contentStyle: 76,
+      engagementQuality: 74,
+      brandSafety: 81,
+    },
+    color: '#1d4ed8',
+    initials: 'SM',
+  },
+  {
+    id: 'brand-006',
+    name: 'Spotify',
+    industry: ['Entertainment', 'Music', 'Streaming'],
+    matchScore: 71,
+    compatibility: {
+      audienceOverlap: 74,
+      contentStyle: 68,
+      engagementQuality: 72,
+      brandSafety: 77,
+    },
+    color: '#22c55e',
+    initials: 'SP',
+  },
+];
+
+export const allIndustries = [
+  'Sportswear',
+  'Fitness',
+  'Lifestyle',
+  'Tech',
+  'Consumer Electronics',
+  'Adventure',
+  'Entertainment',
+  'Music',
+  'Streaming',
+];
