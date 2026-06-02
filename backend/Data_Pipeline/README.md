@@ -1,94 +1,95 @@
-<<<<<<< HEAD
-Overview
-========
+# ⚙️ Ratefluencer AI - Data Engineering & ETL Pipeline
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+This directory houses the Apache Airflow data pipeline deployment managed via **Astronomer (Astro CLI)**. The pipeline is responsible for extracting raw creator data, engineering influencer engagement features, executing validation checks, updating the cloud database (NeonDB), and preparing numeric features for Machine Learning model inference.
 
-Project Contents
-================
+---
 
-Your Astro project contains the following files and folders:
+## 🚀 Key Pipelines (DAGs)
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+The orchestration includes two main DAGs defined in the `dags/` folder:
 
-Deploy Your Project Locally
-===========================
+### 1. `ratefluencer_clean_etl` (Batch Processing)
+* **Frequency**: Manual / Scheduled
+* **Purpose**: Orchestrates the master historical data pipeline.
+* **Flow**:
+  1. **`extract_raw_data`**: Reads raw creator records from the source CSV and staging folders.
+  2. **`validate_data`**: Validates schema inputs, checking numeric metrics bounds (e.g. followers >= 0).
+  3. **`engineer_features`**: Generates calculated columns:
+     - `engagement_rate` = `((likes + comments) / followers) * 100`
+     - `share_rate` = `shares / views`
+     - `save_rate` = `saves / views`
+     - `view_rate` = `views / followers`
+     - `follower_following_ratio` = `followers / following`
+  4. **`load_to_neondb`**: Synchronizes computed features into the Neon Postgres cloud cluster.
 
-Start Airflow on your local machine by running 'astro dev start'.
+### 2. `ratefluencer_realtime_inference_etl` (On-Demand Transformation)
+* **Frequency**: Triggered on-demand when scoring an influencer
+* **Purpose**: Runs preprocessing for interactive predictions.
+* **Tasks**:
+  - **`engineer_influencer_prediction_arrays`**: Fetches latest profile details from RapidAPI (or fallback mock) and saves engineered numerical vectors for Anomaly Detection and Growth models.
+  - **`encode_brand_match_prediction_arrays`**: Combines creator parameters with brand search queries and maps categorical columns (niche, country, gender, tiers) into numerical representations for the Brand Matcher.
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+---
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+## 🛠️ Setup & Local Development
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+### 1. Prerequisites
+Ensure you have the following installed:
+* **Docker Desktop** (must be active and running)
+* **Astro CLI** (Astronomer management client)
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+Install Astro CLI via:
+* **macOS**: `brew install astronomer/tap/astro`
+* **Windows (winget)**: `winget install Astronomer.Astro`
+* **Windows (Chocolatey)**: `choco install astro`
 
-Deploy Your Project to Astronomer
-=================================
+---
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+### 2. running Airflow Locally
 
-Contact
-=======
+1. **Start the containers**:
+   ```bash
+   astro dev start
+   ```
+   This pulls versioned Astro Runtime Docker images and spins up:
+   * **Postgres** (Airflow metadata database)
+   * **Webserver** (UI dashboard hosted at `http://localhost:8080`)
+   * **Scheduler** (monitoring and executing tasks)
+   * **Triggerer** (deferred operator events)
+   * **DAG Processor** (interpreting code updates)
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
-=======
-# Ratefluencers - RizZInt Coders
+2. **Access the Airflow Panel**:
+   * **URL**: [http://localhost:8080](http://localhost:8080)
+   * **Username**: `admin`
+   * **Password**: `admin`
 
-This project is a comprehensive influencer marketing analytics platform, integrating a modern Next.js web application with a robust Python-based Machine Learning backend.
+3. **Stop the containers**:
+   ```bash
+   astro dev stop
+   ```
 
-## Project Structure
+4. **Restart the containers**:
+   ```bash
+   astro dev restart
+   ```
 
-- **Frontend**: A modern web application built with [Next.js](https://nextjs.org).
-- **Predictors (`/predictors`)**: Contains the trained Machine Learning models, label encoders, and Python helper scripts for data analysis.
-  - **Models**:
-    - Anomaly Detection (Isolation Forest)
-    - Growth Prediction (XGBoost Regressor)
-    - Brand Matcher (XGBoost)
+---
 
-## Getting Started
+## 🗄️ Database & Environment Configurations
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm / yarn / pnpm
-- Python 3.8+ (for running the predictor scripts)
-
-### Frontend Development
-
-First, run the development server:
-
+### 1. Database Migrations
+To sync the required SQL schema tables into NeonDB before triggering Airflow DAGs, execute:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+python pipeline_setup/main.py
 ```
+This runs SQLAlchemy schema initialization and creates the `engineered_features` target table.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### Running the ML Models
-
-To interact with the predictor scripts, navigate to the `predictors` folder. The folder includes scripts that use pre-trained models for matching brands and tracking influence growth:
-
-```bash
-cd predictors
-# Make sure to install dependencies like pandas, scikit-learn, and xgboost.
-python model_files/brand_matcher.py
+### 2. Environment Variables (`.env`)
+To let the Airflow container connect to your external databases and APIs, populate the `.env` file inside this directory:
+```env
+NEON_DATABASE_URL=postgresql+asyncpg://neondb_owner:npg_CW0x6DslvAjV@ep-weathered-water-ap14dwje.us-east-1.aws.neon.tech/neondb
+OPENROUTER_API_KEY=your_openrouter_api_key
+RAPIDAPI_KEY=your_rapidapi_key
+RAPIDAPI_HOST=your_rapidapi_host
+DATA_PATH=/usr/local/airflow/include/data
 ```
->>>>>>> 176c019e468d376d1e3419475eccf18fdbede59e
