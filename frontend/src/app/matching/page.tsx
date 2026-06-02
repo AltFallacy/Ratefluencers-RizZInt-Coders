@@ -7,8 +7,9 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ScoreRing } from "@/components/shared/score-ring";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { AnimatedProgressBar as ProgressBar } from "@/components/shared/progress-bar";
-import { ArrowRight, Filter } from "lucide-react";
+import { ArrowRight, Filter, SlidersHorizontal } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { containerVariants, cardVariants, fadeUpVariants } from "@/lib/animations";
 import type { SortOption } from "@/types";
 
 export default function BrandMatchingPage() {
@@ -32,32 +34,26 @@ export default function BrandMatchingPage() {
 
   const filteredAndSortedBrands = useMemo(() => {
     let result = brandMatches;
-
-    // Filter
     if (selectedIndustries.length > 0) {
       result = result.filter((brand) =>
         brand.industry.some((ind) => selectedIndustries.includes(ind))
       );
     }
-
-    // Sort
     result = [...result].sort((a, b) => {
-      if (sortOption === "score") {
-        return b.matchScore - a.matchScore;
-      }
+      if (sortOption === "score") return b.matchScore - a.matchScore;
       return a.name.localeCompare(b.name);
     });
-
     return result;
   }, [selectedIndustries, sortOption]);
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+    <motion.div
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+      className="space-y-6"
+    >
+      <motion.div variants={fadeUpVariants}>
         <PageHeader
           title="Brand Matching"
           description="Discover which brands align best with this influencer based on audience and content compatibility."
@@ -65,142 +61,140 @@ export default function BrandMatchingPage() {
       </motion.div>
 
       {/* Filter & Sort Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        className="flex flex-col gap-4 rounded-xl border border-zinc-800 bg-zinc-900 p-5 md:flex-row md:items-center md:justify-between"
-      >
-        <div className="flex flex-col gap-3 md:flex-1">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-400">
-            <Filter className="size-4" />
-            <span>Filter by Industry</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {allIndustries.map((ind) => {
-              const isSelected = selectedIndustries.includes(ind);
-              return (
+      <motion.div variants={cardVariants}>
+        <Card variant="default" className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-3 md:flex-1">
+            <div className="flex items-center gap-2">
+              <Filter className="size-3.5 text-[var(--accent-light)]" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                Filter by Industry
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {allIndustries.map((ind) => {
+                const isSelected = selectedIndustries.includes(ind);
+                return (
+                  <button
+                    key={ind}
+                    onClick={() => toggleIndustry(ind)}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-150 ${
+                      isSelected
+                        ? "bg-[var(--accent)] text-white shadow-sm shadow-[var(--accent-glow)]"
+                        : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--highlight)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]"
+                    }`}
+                  >
+                    {ind}
+                  </button>
+                );
+              })}
+              {selectedIndustries.length > 0 && (
                 <button
-                  key={ind}
-                  onClick={() => toggleIndustry(ind)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    isSelected
-                      ? "bg-violet-500 text-white"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
-                  }`}
+                  onClick={() => setSelectedIndustries([])}
+                  className="rounded-full px-3 py-1 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                 >
-                  {ind}
+                  Clear all
                 </button>
-              );
-            })}
-            {selectedIndustries.length > 0 && (
-              <button
-                onClick={() => setSelectedIndustries([])}
-                className="rounded-full px-3 py-1 text-xs font-medium text-zinc-500 hover:text-zinc-300"
-              >
-                Clear all
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-2 md:w-48 shrink-0">
-          <label className="text-sm font-medium text-zinc-400">Sort by</label>
-          <Select
-            value={sortOption}
-            onValueChange={(val) => setSortOption(val as SortOption)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="score">Match Score</SelectItem>
-              <SelectItem value="alpha">Alphabetical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="flex flex-col gap-2 md:w-48 shrink-0">
+            <div className="flex items-center gap-1.5">
+              <SlidersHorizontal className="size-3 text-[var(--text-muted)]" />
+              <label className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Sort by</label>
+            </div>
+            <Select
+              value={sortOption}
+              onValueChange={(val) => setSortOption(val as SortOption)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="score">Match Score</SelectItem>
+                <SelectItem value="alpha">Alphabetical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </Card>
       </motion.div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <motion.div
+        variants={containerVariants}
+        className="grid grid-cols-1 gap-5 md:grid-cols-2"
+      >
         {filteredAndSortedBrands.map((brand, i) => (
           <motion.div
             key={brand.id}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
-            className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 p-6 transition-all hover:scale-[1.01] hover:border-zinc-700"
+            variants={cardVariants}
+            whileHover={{ y: -2, scale: 1.005 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div
-                  className="flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-inner"
-                  style={{ backgroundColor: brand.color }}
-                >
-                  {brand.initials}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-zinc-100">
-                    {brand.name}
-                  </h3>
-                  <div className="mt-1 flex flex-wrap gap-1.5">
-                    {brand.industry.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-[10px]">
-                        {tag}
-                      </Badge>
-                    ))}
+            <Card variant="default" className="flex flex-col h-full p-6 hover:border-[var(--border-default)] transition-colors">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex size-11 shrink-0 items-center justify-center rounded-xl text-base font-bold text-white shadow-inner"
+                    style={{ backgroundColor: brand.color }}
+                  >
+                    {brand.initials}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--text-primary)]">
+                      {brand.name}
+                    </h3>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {brand.industry.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-[10px]">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                <div className="shrink-0">
+                  <ScoreRing
+                    score={brand.matchScore}
+                    size={60}
+                    strokeWidth={5}
+                    labelSuffix="%"
+                    className="text-sm"
+                  />
+                </div>
               </div>
-              <div className="shrink-0">
-                <ScoreRing
-                  score={brand.matchScore}
-                  size={64}
-                  strokeWidth={6}
-                  labelSuffix="%"
-                  className="text-lg"
-                />
+
+              {/* Progress Bars */}
+              <div className="flex-1 space-y-3.5">
+                <ProgressBar label="Audience Overlap" value={brand.compatibility.audienceOverlap} />
+                <ProgressBar label="Content Style" value={brand.compatibility.contentStyle} />
+                <ProgressBar label="Engagement Quality" value={brand.compatibility.engagementQuality} />
+                <ProgressBar label="Brand Safety" value={brand.compatibility.brandSafety} />
               </div>
-            </div>
 
-            <div className="flex-1 space-y-4">
-              <ProgressBar
-                label="Audience Overlap"
-                value={brand.compatibility.audienceOverlap}
-              />
-              <ProgressBar
-                label="Content Style"
-                value={brand.compatibility.contentStyle}
-              />
-              <ProgressBar
-                label="Engagement Quality"
-                value={brand.compatibility.engagementQuality}
-              />
-              <ProgressBar
-                label="Brand Safety"
-                value={brand.compatibility.brandSafety}
-              />
-            </div>
-
-            <div className="mt-6 border-t border-zinc-800 pt-5">
-              <Button
-                variant="ghost"
-                className="w-full justify-between text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50"
-              >
-                View Match Details
-                <ArrowRight className="size-4" />
-              </Button>
-            </div>
+              {/* Footer */}
+              <div className="mt-5 border-t border-[var(--border-subtle)] pt-4">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--highlight)]"
+                >
+                  View Match Details
+                  <ArrowRight className="size-3.5" />
+                </Button>
+              </div>
+            </Card>
           </motion.div>
         ))}
+
         {filteredAndSortedBrands.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 py-16 text-center">
-            <p className="text-zinc-400 mb-2">No brands match the selected filters.</p>
+          <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border-subtle)] py-20 text-center">
+            <p className="text-[var(--text-muted)] mb-3 text-sm">No brands match the selected filters.</p>
             <Button variant="outline" onClick={() => setSelectedIndustries([])}>
               Clear Filters
             </Button>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

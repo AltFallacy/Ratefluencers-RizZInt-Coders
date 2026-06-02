@@ -1,0 +1,111 @@
+export const TOKENS = {
+  colors: {
+    dark: {
+      bgBase: "#0a0a0d",
+      bgSurface: "#111116",
+      bgElevated: "#18181e",
+      bgOverlay: "#1f1f27",
+      bgGlass: "rgba(17, 17, 22, 0.7)",
+      borderSubtle: "rgba(255, 255, 255, 0.055)",
+      borderDefault: "rgba(255, 255, 255, 0.10)",
+      borderStrong: "rgba(255, 255, 255, 0.18)",
+      textPrimary: "#eeeef2",
+      textSecondary: "#8e8ea0",
+      textMuted: "#4a4a5a",
+      textAccent: "#a78bfa",
+      accent: "#7c3aed",
+      accentLight: "#a78bfa",
+      accentGlow: "rgba(124, 58, 237, 0.20)",
+      accentSubtle: "rgba(124, 58, 237, 0.08)",
+      accent2: "#6366f1",
+      accent2Glow: "rgba(99, 102, 241, 0.15)",
+      highlight: "rgba(167, 139, 250, 0.06)",
+      success: "#10b981",
+      successSubtle: "rgba(16, 185, 129, 0.10)",
+      warning: "#f59e0b",
+      warningSubtle: "rgba(245, 158, 11, 0.10)",
+      danger: "#ef4444",
+      dangerSubtle: "rgba(239, 68, 68, 0.10)",
+      info: "#3b82f6",
+      infoSubtle: "rgba(59, 130, 246, 0.10)",
+      chart1: "#a78bfa",
+      chart2: "#38bdf8",
+      chart3: "#34d399",
+      chart4: "#fb923c",
+      chart5: "#f472b6"
+    },
+    light: {
+      bgBase: "#f4f4f8",
+      bgSurface: "#ffffff",
+      bgElevated: "#ededf3",
+      bgOverlay: "#ffffff",
+      bgGlass: "rgba(255, 255, 255, 0.75)",
+      borderSubtle: "rgba(0, 0, 0, 0.055)",
+      borderDefault: "rgba(0, 0, 0, 0.10)",
+      borderStrong: "rgba(0, 0, 0, 0.18)",
+      textPrimary: "#0f0f14",
+      textSecondary: "#5c5c72",
+      textMuted: "#9898ac",
+      textAccent: "#6d28d9",
+      accent: "#7c3aed",
+      accentLight: "#6d28d9",
+      accentGlow: "rgba(124, 58, 237, 0.14)",
+      accentSubtle: "rgba(124, 58, 237, 0.06)",
+      accent2: "#6366f1",
+      accent2Glow: "rgba(99, 102, 241, 0.12)",
+      highlight: "rgba(124, 58, 237, 0.04)",
+      success: "#059669",
+      successSubtle: "rgba(5, 150, 105, 0.08)",
+      warning: "#d97706",
+      warningSubtle: "rgba(217, 119, 6, 0.08)",
+      danger: "#dc2626",
+      dangerSubtle: "rgba(220, 38, 38, 0.08)",
+      info: "#2563eb",
+      infoSubtle: "rgba(37, 99, 235, 0.08)",
+      chart1: "#7c3aed",
+      chart2: "#0284c7",
+      chart3: "#059669",
+      chart4: "#ea580c",
+      chart5: "#db2777"
+    }
+  },
+  typography: {
+    fontSans: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontMono: "'JetBrains Mono', 'Fira Code', monospace",
+    sizes: {
+      xs: "11px",
+      sm: "13px",
+      base: "14px",
+      md: "16px",
+      lg: "20px",
+      xl: "24px",
+      xxl: "30px",
+      xxxl: "40px",
+      hero: "72px"
+    },
+    weights: {
+      regular: 400,
+      medium: 500,
+      semibold: 600,
+      bold: 700
+    },
+    leading: {
+      tight: 1.2,
+      normal: 1.5,
+      relaxed: 1.7
+    },
+    tracking: {
+      tight: "-0.02em",
+      normal: "0",
+      wide: "0.05em",
+      widest: "0.10em"
+    }
+  },
+  shadows: {
+    sm: "0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06)",
+    md: "0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08)",
+    lg: "0 8px 32px rgba(0,0,0,0.16), 0 4px 12px rgba(0,0,0,0.10)",
+    xl: "0 24px 64px rgba(0,0,0,0.24), 0 8px 24px rgba(0,0,0,0.12)",
+    accent: "0 0 0 3px var(--accent-glow)"
+  }
+} as const;

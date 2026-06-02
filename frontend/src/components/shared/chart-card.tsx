@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface ChartCardProps {
   title: string;
@@ -16,22 +17,23 @@ export function ChartCard({
   action,
 }: ChartCardProps) {
   return (
-    <div
+    <Card
+      variant="default"
       className={cn(
-        "rounded-xl border border-zinc-800 bg-zinc-900 p-5",
+        "p-6",
         className
       )}
     >
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-sm font-medium text-zinc-100">{title}</h3>
+          <h3 className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">{title}</h3>
           {subtitle && (
-            <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">{subtitle}</p>
           )}
         </div>
         {action && <div className="shrink-0">{action}</div>}
       </div>
       {children}
-    </div>
+    </Card>
   );
 }

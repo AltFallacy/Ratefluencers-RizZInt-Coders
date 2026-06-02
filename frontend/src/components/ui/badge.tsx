@@ -3,27 +3,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground",
+          "border-transparent bg-[var(--accent)] text-white",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground",
+          "border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground",
-        outline: "text-foreground",
+          "border-transparent bg-[var(--danger)] text-white",
+        outline: "border-[var(--border-default)] text-[var(--text-primary)]",
         success:
-          "border-transparent bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+          "bg-[var(--success-subtle)] text-[var(--success)] border-[var(--success)]/10",
         warning:
-          "border-transparent bg-amber-500/15 text-amber-400 border-amber-500/20",
+          "bg-[var(--warning-subtle)] text-[var(--warning)] border-[var(--warning)]/10",
         danger:
-          "border-transparent bg-rose-500/15 text-rose-400 border-rose-500/20",
+          "bg-[var(--danger-subtle)] text-[var(--danger)] border-[var(--danger)]/10",
         violet:
-          "border-transparent bg-violet-500/15 text-violet-400 border-violet-500/20",
+          "bg-[var(--accent-subtle)] text-[var(--accent-light)] border-[var(--accent)]/10",
         sky:
-          "border-transparent bg-sky-500/15 text-sky-400 border-sky-500/20",
+          "bg-[var(--info-subtle)] text-[var(--info)] border-[var(--info)]/10",
       },
     },
     defaultVariants: {
