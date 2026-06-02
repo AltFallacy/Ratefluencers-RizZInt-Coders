@@ -1,0 +1,66 @@
+========================================================================
+MODEL 1: ANOMALY DETECTION (ISOLATION FOREST)
+========================================================================
+Purpose: Detects fraudulent/bot influencers.
+Type: Unsupervised. Returns 1 for normal, -1 for anomaly.
+
+--- User-entered / Frontend Inputs ---
+- None directly entered by the user (typically calculated on the backend from influencer handle).
+
+--- Table/Database Inputs (Required Columns for Model) ---
+['engagement_rate', 'comment_quality_ratio', 'share_rate', 'save_rate', 'view_rate', 
+'follower_following_ratio', 'posting_consistency', 'like_spike_variance', 'growth_velocity', 
+'audience_quality_score', 'followers_count', 'avg_likes_7d', 'avg_comments_7d', 
+'engagement_rate_7d', 'posts_this_week', 'avg_likes', 'avg_comments', 'avg_shares', 
+'avg_saves', 'avg_views', 'avg_reel_plays', 'post_frequency', 'story_frequency', 
+'peak_posting_hour', 'authenticity_score', 'bot_risk', 'fraud_risk', 'growth_score', 
+'growth_30d', 'growth_60d', 'growth_90d', 'campaign_score', 'brand_match_score', 
+'ratefluencer_score']
+
+
+========================================================================
+MODEL 2: GROWTH RATE PREDICTION (XGBoost Regressor)
+========================================================================
+Purpose: Predicts the future percentage growth of an influencer.
+Type: Regression. Returns a float (e.g. 5.5%).
+
+--- User-entered / Frontend Inputs ---
+- None directly entered by the user.
+
+--- Table/Database Inputs (Required Columns for Model) ---
+['engagement_rate', 'comment_quality_ratio', 'share_rate', 'save_rate', 'view_rate', 
+'follower_following_ratio', 'posting_consistency', 'like_spike_variance', 'growth_velocity', 
+'audience_quality_score', 'followers_count', 'avg_likes_7d', 'avg_comments_7d', 
+'engagement_rate_7d', 'posts_this_week', 'avg_likes', 'avg_comments', 'avg_shares', 
+'avg_saves', 'avg_views', 'avg_reel_plays', 'post_frequency', 'story_frequency', 
+'peak_posting_hour']
+
+
+========================================================================
+MODEL 3: BRAND SPONSORSHIP MATCHER (XGBoost Regressor)
+========================================================================
+Purpose: Predicts the compatibility score between a Brand and an Influencer.
+Type: Regression. Returns a score between 0 and 10.
+
+--- User-entered / Frontend Inputs (The Brand's Form) ---
+When a brand registers or searches for influencers, they enter:
+- category (string, e.g. "beauty", "sportswear")
+- target_age_min (int, e.g. 18)
+- target_age_max (int, e.g. 35)
+- target_gender (string, e.g. "female", "all")
+- min_followers (int, e.g. 10000)
+- max_followers (int, e.g. 500000)
+- budget_tier (string, e.g. "mid", "premium")
+- country_focus (string, e.g. "India", "Global")
+
+--- Table/Database Inputs (The Influencer's Stats) ---
+- platform (string, e.g. "Instagram")
+- niche (string, e.g. "education")
+- followers (int)
+- following (int)
+- total_posts (int)
+- account_age_days (int)
+- is_verified (bool)
+- country (string)
+- tier (string, e.g. "micro", "nano")
+- is_bot (bool)
