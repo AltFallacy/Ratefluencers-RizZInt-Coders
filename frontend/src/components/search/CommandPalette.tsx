@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Clock, FileText, Target, Users, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchStore } from "@/store";
+import { useSearchStore, useInfluencerStore } from "@/store";
 import { mockInfluencerList } from "@/data/influencer";
 import { historicalCampaigns } from "@/data/campaigns";
 import { overlayVariants } from "@/lib/animations";
@@ -30,6 +30,7 @@ const mockReports = [
 export function CommandPalette() {
   const router = useRouter();
   const { isOpen, setOpen, query, setQuery, history, addToHistory } = useSearchStore();
+  const setActiveInfluencerId = useInfluencerStore((state) => state.setActiveInfluencerId);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -130,6 +131,9 @@ export function CommandPalette() {
         const selected = flatResults[selectedIndex];
         if (selected) {
           addToHistory(query);
+          if (selected.type === "influencer") {
+            setActiveInfluencerId(selected.id);
+          }
           router.push(selected.url);
           setOpen(false);
         }
@@ -138,7 +142,7 @@ export function CommandPalette() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, flatResults, selectedIndex, query, router, addToHistory, setOpen]);
+  }, [isOpen, flatResults, selectedIndex, query, router, addToHistory, setOpen, setActiveInfluencerId]);
 
   if (!isOpen) return null;
 
@@ -235,6 +239,7 @@ export function CommandPalette() {
                           key={inf.id}
                           onClick={() => {
                             addToHistory(query);
+                            setActiveInfluencerId(inf.id);
                             router.push(`/dashboard`);
                             setOpen(false);
                           }}

@@ -88,3 +88,15 @@ export const useSearchStore = create<SearchStore>((set) => ({
       return { history: newHistory };
     }),
 }));
+
+// Active Influencer state
+interface InfluencerStore {
+  activeInfluencerId: string;
+  setActiveInfluencerId: (id: string) => void;
+}
+
+export const useInfluencerStore = create<InfluencerStore>((set) => ({
+  activeInfluencerId: 'inf-001',
+  setActiveInfluencerId: (id) => set({ activeInfluencerId: id }),
+}));
+

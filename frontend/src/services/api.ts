@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+// With the Next.js proxy rewrite, /api/v1 on the same origin proxies to FastAPI.
+// This means CORS is never an issue and we don't need NEXT_PUBLIC_API_URL in the browser.
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1',
-  timeout: 10_000,
+  baseURL: '/api/v1',
+  timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,7 +23,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
-    // TODO: handle 401 / 403 / 500 globally
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 404) {
+        console.warn('[API] 404 Not Found:', error.config?.url);
+      } else if (status && status >= 500) {
+        console.error('[API] Server error:', status, error.config?.url);
+      } else if (!error.response) {
+        // Network error / backend offline
+        console.warn('[API] Backend offline or unreachable — falling back to demo data');
+      }
+    }
     return Promise.reject(error);
   }
 );

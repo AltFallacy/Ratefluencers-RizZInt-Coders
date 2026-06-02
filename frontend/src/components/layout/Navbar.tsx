@@ -5,6 +5,7 @@ import { Bell, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
+import { useInfluencer } from "@/hooks/use-api";
 
 const routeTitleMap: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -19,6 +20,19 @@ const routeTitleMap: Record<string, string> = {
 export function Navbar() {
   const pathname = usePathname();
   const { toggleMobileSidebar } = useUIStore();
+  const { data: influencer } = useInfluencer();
+
+  const displayName = influencer?.name ?? "Aria Westfield";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const shortName = displayName.split(" ").length > 1
+    ? `${displayName.split(" ")[0]} ${displayName.split(" ")[1][0]}.`
+    : displayName;
 
   // Find matching title or default to parent path
   const currentTitle =
@@ -60,10 +74,10 @@ export function Navbar() {
         {/* User Profile Avatar Chip */}
         <div className="flex h-[34px] items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-elevated)] pl-1.5 pr-2.5 hover:bg-[var(--bg-overlay)] hover:border-[var(--border-default)] transition-all cursor-pointer">
           <div className="flex w-[22px] h-[22px] items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent2)] text-[10px] font-bold text-white shadow-sm shrink-0">
-            JW
+            {initials}
           </div>
           <span className="hidden sm:inline text-xs font-semibold text-[var(--text-primary)] select-none">
-            Aria W.
+            {shortName}
           </span>
         </div>
       </div>

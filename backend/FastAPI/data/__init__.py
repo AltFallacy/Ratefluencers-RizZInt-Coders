@@ -1,0 +1,1 @@
+"""FastAPI data package init."""

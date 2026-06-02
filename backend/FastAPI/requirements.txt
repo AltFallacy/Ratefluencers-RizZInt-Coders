@@ -13,3 +13,5 @@ python-dotenv
 openai
 psycopg2-binary
 pydantic
+python-dateutil
+httpx
