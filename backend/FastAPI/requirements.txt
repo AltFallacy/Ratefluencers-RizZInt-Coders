@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg
+qdrant-client
+sentence-transformers
+scikit-learn
+xgboost
+joblib
+pandas
+numpy
+python-dotenv
+openai
+psycopg2-binary
+pydantic

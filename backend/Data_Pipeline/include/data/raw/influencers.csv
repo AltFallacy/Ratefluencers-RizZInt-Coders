@@ -1,0 +1,5 @@
+influencer_id,username,followers,following,avg_likes,avg_comments,avg_shares,avg_views,avg_saves,niche,country,tier,is_verified
+inf_001,artem_lipko,500000,600,12000,450,300,45000,800,tech,US,macro,True
+inf_002,praveen_tech,85000,320,4100,190,150,12000,240,tech,IN,micro,False
+inf_003,style_by_ria,1200000,800,45000,2100,1200,150000,4300,fashion,GLOBAL,mega,True
+inf_004,fit_with_aniket,12000,150,600,45,12,3500,80,fitness,IN,nano,False

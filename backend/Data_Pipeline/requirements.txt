@@ -1,0 +1,16 @@
+apache-airflow-providers-postgres
+apache-airflow-providers-http
+sqlalchemy[asyncio]
+asyncpg
+qdrant-client
+pandas
+numpy
+scikit-learn
+xgboost
+python-dotenv
+faker
+tqdm
+joblib
+psycopg2-binary
+openai
+requests
