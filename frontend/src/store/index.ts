@@ -100,3 +100,33 @@ export const useInfluencerStore = create<InfluencerStore>((set) => ({
   setActiveInfluencerId: (id) => set({ activeInfluencerId: id }),
 }));
 
+// API Settings state
+const getSavedApiKey = (): string => {
+  if (typeof window !== 'undefined') {
+    try {
+      return localStorage.getItem('rf_openrouter_api_key') || '';
+    } catch {
+      return '';
+    }
+  }
+  return '';
+};
+
+interface ApiSettingsStore {
+  openRouterKey: string;
+  setOpenRouterKey: (key: string) => void;
+}
+
+export const useApiSettingsStore = create<ApiSettingsStore>((set) => ({
+  openRouterKey: getSavedApiKey(),
+  setOpenRouterKey: (key: string) => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('rf_openrouter_api_key', key);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    set({ openRouterKey: key });
+  },
+}));

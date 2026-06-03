@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Request
-from schemas.influencer import CampaignSimulatorRequest, InfluencerInput
+from fastapi import APIRouter, Request, HTTPException
+from schemas.influencer import CampaignSimulatorRequest
 from modules.score import compute_ratefluencer_score
 from modules.authenticity import predict_authenticity
 from modules.growth import predict_growth
@@ -14,8 +14,12 @@ async def compute_score(req: CampaignSimulatorRequest, request: Request):
     Compute the full Ratefluencer composite score from all sub-model scores.
     Also runs the campaign simulator with the provided budget/duration/type.
     """
-    inf   = req.influencer
     state = request.app.state
+
+    if state.auth_model is None or state.growth_model is None or state.campaign_model is None:
+        raise HTTPException(status_code=503, detail="One or more ML models not loaded — check server logs.")
+
+    inf = req.influencer
 
     auth_result     = predict_authenticity(inf, state.auth_model)
     growth_result   = predict_growth(inf, state.growth_model, state.growth_scaler)

@@ -15,19 +15,37 @@ _MODEL_DIR  = os.path.join(_BASE_DIR, "..", "..", "predictors", "models")
 _MODEL_DIR  = os.path.normpath(_MODEL_DIR)
 
 
+def _load_model(path: str, label: str):
+    """Load a joblib model file, returning None with a warning on failure."""
+    try:
+        m = joblib.load(path)
+        print(f"[OK] Loaded {label}")
+        return m
+    except FileNotFoundError:
+        print(f"[WARN] Model not found: {path} — {label} will be unavailable")
+        return None
+    except Exception as exc:
+        print(f"[WARN] Failed to load {label}: {exc}")
+        return None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ── Load all ML models ONCE at startup ────────────────────────────────────
-    app.state.auth_model     = joblib.load(os.path.join(_MODEL_DIR, "anomaly_detection_model.pkl"))
-    app.state.growth_model   = joblib.load(os.path.join(_MODEL_DIR, "growth_prediction_model.pkl"))
-    app.state.campaign_model = joblib.load(os.path.join(_MODEL_DIR, "brand_match_model.pkl"))
-    app.state.brand_match_encoders = joblib.load(os.path.join(_MODEL_DIR, "brand_match_encoders.pkl"))
+    app.state.auth_model     = _load_model(os.path.join(_MODEL_DIR, "anomaly_detection_model.pkl"), "Anomaly Detection")
+    app.state.growth_model   = _load_model(os.path.join(_MODEL_DIR, "growth_prediction_model.pkl"), "Growth Prediction")
+    app.state.campaign_model = _load_model(os.path.join(_MODEL_DIR, "brand_match_model.pkl"),       "Brand Match")
+    app.state.brand_match_encoders = _load_model(os.path.join(_MODEL_DIR, "brand_match_encoders.pkl"), "Brand Match Encoders")
 
     # Scalers (not used by the real models but kept for API compatibility)
     app.state.growth_scaler   = None
     app.state.campaign_scaler = app.state.brand_match_encoders
 
-    print(f"[OK] ML models and encoders loaded from: {_MODEL_DIR}")
+    loaded = sum(1 for m in [
+        app.state.auth_model, app.state.growth_model,
+        app.state.campaign_model, app.state.brand_match_encoders,
+    ] if m is not None)
+    print(f"[OK] {loaded}/4 ML models loaded from: {_MODEL_DIR}")
     yield
     print("[STOP] FastAPI shutting down")
 

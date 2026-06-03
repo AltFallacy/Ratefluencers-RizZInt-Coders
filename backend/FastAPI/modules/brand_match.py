@@ -102,6 +102,7 @@ def build_brand_match_result(
     campaign_scaler=None,
     index: int = 0,
     include_explanation: bool = False,
+    api_key: str = None,
 ) -> dict:
     match_score = predict_brand_match(inf, brand, campaign_model, campaign_scaler)
 
@@ -110,7 +111,7 @@ def build_brand_match_result(
     engagement_quality = round(min(99.0, match_score * 1.01 + 0.5), 1)
     brand_safety       = round(min(99.0, match_score * 0.99 + 3.0), 1)
 
-    explanation = get_brand_explanation(inf, brand) if include_explanation else None
+    explanation = get_brand_explanation(inf, brand, api_key) if include_explanation else None
 
     return {
         "brand_name":  brand.brand_name,
@@ -130,7 +131,7 @@ def build_brand_match_result(
     }
 
 
-def get_brand_explanation(inf: "InfluencerInput", brand: "BrandInput") -> str:
+def get_brand_explanation(inf: "InfluencerInput", brand: "BrandInput", api_key: str = None) -> str:
     system = (
         "You are a concise influencer marketing analyst. "
         "Given an influencer's profile and a brand's targeting criteria, "
@@ -143,10 +144,10 @@ def get_brand_explanation(inf: "InfluencerInput", brand: "BrandInput") -> str:
         f"Brand: {brand.brand_name}, category={brand.category}, targets {brand.target_gender} "
         f"aged {brand.target_age_min}-{brand.target_age_max}, budget_tier={brand.budget_tier}."
     )
-    return chat_with_system(system, user)
+    return chat_with_system(system, user, api_key=api_key)
 
 
-def get_campaign_recommendation(inf: "InfluencerInput", score: dict) -> dict:
+def get_campaign_recommendation(inf: "InfluencerInput", score: dict, api_key: str = None) -> dict:
     system = (
         "You are a senior influencer marketing strategist. "
         "Given an influencer's Ratefluencer score breakdown, recommend exactly 3 specific "
@@ -160,7 +161,7 @@ def get_campaign_recommendation(inf: "InfluencerInput", score: dict) -> dict:
         f"Improvement areas: {score.get('improvement_areas', [])}. "
         f"Platform: {inf.platform}."
     )
-    raw = chat_with_system(system, user)
+    raw = chat_with_system(system, user, api_key=api_key)
     try:
         import json, re
         match = re.search(r"\{.*\}", raw, re.DOTALL)

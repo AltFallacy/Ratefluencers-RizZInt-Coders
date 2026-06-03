@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { useInfluencer } from "@/hooks/use-api";
+import { SettingsDialog } from "@/components/layout/SettingsDialog";
 
 const routeTitleMap: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -59,6 +60,9 @@ export function Navbar() {
 
       {/* Right: Actions & User Avatar Chip */}
       <div className="flex items-center gap-4">
+        {/* Settings Dialog (BYOK) */}
+        <SettingsDialog />
+
         {/* Notification Bell */}
         <button
           className="relative rounded-lg p-1.5 text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors focus:outline-none cursor-pointer"
@@ -84,3 +88,4 @@ export function Navbar() {
     </header>
   );
 }
+

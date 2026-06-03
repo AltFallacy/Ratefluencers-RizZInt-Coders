@@ -81,7 +81,7 @@ The frontend is built on Next.js 16, React 19, and Tailwind CSS v4.
    ```
 
 3. **Configure Environment Variables**:
-   Create a `.env.local` file in the `frontend/` directory:
+   Create a `.env.local` file in the `frontend/` directory. By default, the application is pre-configured to proxy `/api/v1` to FastAPI on port 8000:
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
    ```
@@ -118,12 +118,13 @@ The backend exposes FastAPI endpoints to predict scores and match campaigns usin
    ```
 
 4. **Configure Environment Variables**:
-   Create a `.env` file in the `backend/FastAPI` directory:
+   Create a `.env` file in the `backend/FastAPI` directory. The application handles missing variables gracefully, so you can leave them empty for local testing:
    ```env
-   NEON_DATABASE_URL=postgresql+asyncpg://neondb_owner:npg_CW0x6DslvAjV@ep-weathered-water-ap14dwje.us-east-1.aws.neon.tech/neondb
-   OPENROUTER_API_KEY=your_openrouter_api_key
-   QDRANT_URL=http://localhost:6333
-   QDRANT_API_KEY=your_qdrant_api_key
+   # Postgres URL (Leave empty to use in-memory mode)
+   NEON_DATABASE_URL=postgresql+asyncpg://user:password@host/db
+   
+   # Optional fallback AI key (users can also provide this via the Frontend UI)
+   OPENROUTER_API_KEY=
    ```
 
 5. **Start the API Server**:
@@ -131,6 +132,17 @@ The backend exposes FastAPI endpoints to predict scores and match campaigns usin
    uvicorn main:app --reload --port 8000
    ```
    * Access the interactive swagger documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+---
+
+### 🔑 Bring Your Own Key (OpenRouter AI)
+To use the AI-powered Campaign Recommendations and Brand Match Explanations, you need an [OpenRouter API Key](https://openrouter.ai/). 
+
+**How to add your key:**
+1. Start both the Frontend and Backend servers.
+2. Open the Frontend at `http://localhost:3000`.
+3. In the top navigation bar, click the **Key icon (🔑) Settings button**.
+4. Paste your OpenRouter API Key. It will be stored locally in your browser and securely sent to the backend to generate AI insights on the fly!
 
 ---
 

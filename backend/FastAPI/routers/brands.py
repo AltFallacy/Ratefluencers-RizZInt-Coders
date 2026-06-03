@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -34,12 +34,18 @@ async def match_brands(req: BrandMatchRequest, request: Request):
     """
     Compute brand compatibility scores for a list of brands against an influencer.
     """
-    state   = request.app.state
+    state = request.app.state
+    if state.campaign_model is None:
+        raise HTTPException(status_code=503, detail="Brand match model not loaded — check server logs.")
+
+    api_key = request.headers.get("x-openrouter-key")
+
     results = [
         build_brand_match_result(
             req.influencer, brand,
             state.campaign_model, state.campaign_scaler,
             index=i,
+            api_key=api_key,
         )
         for i, brand in enumerate(req.brands)
     ]
@@ -55,14 +61,16 @@ async def explain_match(req: ExplainRequest, request: Request):
         brand_name  = req.brand_name,
         category    = req.category,
     )
-    explanation = get_brand_explanation(req.influencer, brand)
+    api_key = request.headers.get("x-openrouter-key")
+    explanation = get_brand_explanation(req.influencer, brand, api_key=api_key)
     return {"brand": req.brand_name, "explanation": explanation}
 
 
 @router.post("/campaign-recommendation")
-async def campaign_rec(req: CampaignRecRequest):
+async def campaign_rec(req: CampaignRecRequest, request: Request):
     """
     AI-powered campaign strategy recommendations based on score breakdown.
     """
-    rec = get_campaign_recommendation(req.influencer, req.score)
+    api_key = request.headers.get("x-openrouter-key")
+    rec = get_campaign_recommendation(req.influencer, req.score, api_key=api_key)
     return rec

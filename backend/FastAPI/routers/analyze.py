@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from schemas.influencer import (
     InfluencerInput, AnalyzeRequest, FullAnalysisResponse,
     BrandInput,
@@ -25,7 +25,6 @@ def get_influencer(influencer_id: str):
     """Return a single influencer profile."""
     inf = INFLUENCER_STORE.get(influencer_id)
     if not inf:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Influencer not found")
     return inf
 
@@ -36,8 +35,12 @@ async def analyze_influencer(req: AnalyzeRequest, request: Request):
     Full analysis endpoint — runs all ML models and returns a complete
     FullAnalysisResponse. Accepts an InfluencerInput + optional list of BrandInputs.
     """
-    inf   = req.influencer
     state = request.app.state
+
+    if state.auth_model is None or state.growth_model is None or state.campaign_model is None:
+        raise HTTPException(status_code=503, detail="One or more ML models not loaded — check server logs.")
+
+    inf = req.influencer
 
     # ── ML model inference ──────────────────────────────────────────────────
     auth_result     = predict_authenticity(inf, state.auth_model)
@@ -49,8 +52,9 @@ async def analyze_influencer(req: AnalyzeRequest, request: Request):
 
     # ── Brand matches ────────────────────────────────────────────────────────
     brand_inputs = req.brands or _default_brands()
+    api_key = request.headers.get("x-openrouter-key")
     brand_results = [
-        build_brand_match_result(inf, b, state.campaign_model, state.campaign_scaler, i)
+        build_brand_match_result(inf, b, state.campaign_model, state.campaign_scaler, i, api_key=api_key)
         for i, b in enumerate(brand_inputs)
     ]
     avg_brand_score = (

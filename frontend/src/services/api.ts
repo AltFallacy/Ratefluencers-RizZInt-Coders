@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useApiSettingsStore } from '@/store';
 
 // With the Next.js proxy rewrite, /api/v1 on the same origin proxies to FastAPI.
 // This means CORS is never an issue and we don't need NEXT_PUBLIC_API_URL in the browser.
@@ -13,6 +14,12 @@ export const apiClient = axios.create({
 // Request interceptor — attach auth token when available
 apiClient.interceptors.request.use(
   (config) => {
+    // Attach custom OpenRouter API key if the user has provided one
+    const openRouterKey = useApiSettingsStore.getState().openRouterKey;
+    if (openRouterKey && openRouterKey.trim()) {
+      config.headers['X-OpenRouter-Key'] = openRouterKey.trim();
+    }
+    
     // TODO: attach Bearer token when auth is implemented
     return config;
   },

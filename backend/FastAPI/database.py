@@ -1,7 +1,5 @@
 import os
 import ssl
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,27 +8,50 @@ load_dotenv()
 
 _raw_url = os.getenv("NEON_DATABASE_URL", "")
 
-# Strip any ?sslmode=... query params — asyncpg handles SSL via connect_args
-_database_url = _raw_url.split("?")[0] if "?" in _raw_url else _raw_url
+# Only initialise the engine if a real connection string is provided.
+# When running without a database (using the in-memory influencer store)
+# we skip engine creation so the app starts cleanly.
+engine = None
+AsyncSessionLocal = None
+Base = None
 
-# Permissive SSL context (required for NeonDB pooler from Docker / Windows)
-_ssl_ctx = ssl.create_default_context()
-_ssl_ctx.check_hostname = False
-_ssl_ctx.verify_mode = ssl.CERT_NONE
+if _raw_url and _raw_url.strip() and not _raw_url.startswith("postgresql://user:"):
+    try:
+        from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+        from sqlalchemy.orm import sessionmaker, declarative_base
 
-engine = create_async_engine(
-    _database_url,
-    echo=False,
-    future=True,
-    connect_args={"ssl": _ssl_ctx},
-)
+        # Strip any ?sslmode=... query params — asyncpg handles SSL via connect_args
+        _database_url = _raw_url.split("?")[0] if "?" in _raw_url else _raw_url
 
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
+        # Permissive SSL context (required for NeonDB pooler from Docker / Windows)
+        _ssl_ctx = ssl.create_default_context()
+        _ssl_ctx.check_hostname = False
+        _ssl_ctx.verify_mode = ssl.CERT_NONE
+
+        engine = create_async_engine(
+            _database_url,
+            echo=False,
+            future=True,
+            connect_args={"ssl": _ssl_ctx},
+        )
+
+        AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+        Base = declarative_base()
+        print("[DB] NeonDB engine initialised.")
+    except Exception as e:
+        print(f"[DB] WARNING: Could not initialise NeonDB engine: {e}")
+        engine = None
+        AsyncSessionLocal = None
+        Base = None
+else:
+    print("[DB] No NEON_DATABASE_URL configured — running with in-memory store only.")
 
 
 async def get_db():
-    """FastAPI dependency that yields an async DB session."""
+    """FastAPI dependency that yields an async DB session (no-op if DB not configured)."""
+    if AsyncSessionLocal is None:
+        yield None
+        return
     async with AsyncSessionLocal() as session:
         try:
             yield session

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from schemas.influencer import InfluencerInput
 from modules.growth import predict_growth
 
@@ -11,5 +11,8 @@ async def predict(inf: InfluencerInput, request: Request):
     Run the XGBoost growth model.
     Returns a GrowthResponse-compatible payload with forecasts and timeline.
     """
-    result = predict_growth(inf, request.app.state.growth_model, request.app.state.growth_scaler)
+    model = request.app.state.growth_model
+    if model is None:
+        raise HTTPException(status_code=503, detail="Growth model not loaded — check server logs.")
+    result = predict_growth(inf, model, request.app.state.growth_scaler)
     return result
